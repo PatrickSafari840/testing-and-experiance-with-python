@@ -11,6 +11,7 @@ GREEN = (0, 255, 0)
 # Define screen dimensions
 WIDTH = 800
 HEIGHT = 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 # Define snake size and speed
 snake_block = 10
@@ -25,6 +26,7 @@ def draw_snake(snake_list):
 
 def message(msg, color):
     """Displays a message on the screen."""
+
     font_style = pygame.font.SysFont(None, 30)
     mesg = font_style.render(msg, True, color)
     screen.blit(mesg, [WIDTH / 6, HEIGHT / 3])
@@ -32,6 +34,11 @@ def message(msg, color):
 
 def game_loop():
     """The main game loop."""
+    # Initialize Pygame
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Snake Game")
+
     game_over = False
     game_close = False
 
@@ -48,25 +55,7 @@ def game_loop():
 
     clock = pygame.time.Clock()
 
-    # Initialize Pygame
-    pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Snake Game")
-
     while not game_over:
-
-        while game_close:
-            screen.fill(BLACK)
-            message("You Lost! Press P to Play Again or Q to Quit", RED)
-            pygame.display.update()
-
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_p:
-                        game_loop()
-                    if event.key == pygame.K_q:
-                        game_over = True
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = True
@@ -108,4 +97,23 @@ def game_loop():
 
         if x1 == food_x and y1 == food_y:
             food_x = round(random.randrange(0, WIDTH - snake_block) / 10.0) * 10.0
-            food_y = round(random.randrange(0, HEIGHT))
+            food_y = round(random.randrange(0, HEIGHT - snake_block) / 10.0) * 10.0
+
+        clock.tick(snake_speed)
+
+        if game_close:
+            screen.fill(BLACK)
+            message("You Lost! Press P to Play Again or Q to Quit", RED)
+            pygame.display.update()
+
+            while game_close:
+                for event in pygame.event.get():
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_p:
+                            game_loop()
+                        if event.key == pygame.K_q:
+                            game_over = True
+                            game_close = False  # Ensure to exit the close loop as well
+
+    pygame.quit()
+    quit()
